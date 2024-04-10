@@ -1,9 +1,11 @@
+Repository contains project of pdf service based od `FAST API`, `httpx` and `pypdf` modules.
+
 Repository Structure
 --------------------
 
 ### 1\. main.py
 
-The `main.py` file runs the `main` function from the `example_queryset.py` file.
+The `main.py` file runs the *main* function from the `example_queryset.py` file.
 
 ### 2\. example\_queryset.py
 
@@ -20,7 +22,7 @@ The `example_queryset.py` file contains an example function and demonstrates the
 
 ### 3\. pdf\_server
 
-The `pdf_server` folder contains the server logic.
+The `pdf_server.py` folder contains the server logic.
 
 ### 4\. functions\_pdf.py
 
