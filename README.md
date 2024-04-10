@@ -1,4 +1,4 @@
-Repository Structure
+*Repository Structure*
 1. main.py
 The main.py file runs the main function from the example_queryset.py file.
 
