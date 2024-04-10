@@ -20,10 +20,13 @@ The `example_queryset.py` file contains an example function and demonstrates the
 *   Text extraction.
 *   Image extraction.
 
-### 3\. pdf\_server.py
+### 3\. httpx\_reqests.py
+The `httpx_requests.py` contains asynchronic queries *PUT*, *GET*, *DELETE*, *PUSH* and *PATCH*, which allow connection client to server.
+
+### 4\. pdf\_server.py
 
 The `pdf_server.py` folder contains the server logic.
 
-### 4\. functions\_pdf.py
+### 5\. functions\_pdf.py
 
 The `functions_pdf.py` file contains the `PDF` class, which allows manipulation of PDF files.
