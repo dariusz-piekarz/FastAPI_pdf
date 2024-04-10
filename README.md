@@ -20,7 +20,7 @@ The `example_queryset.py` file contains an example function and demonstrates the
 *   Text extraction.
 *   Image extraction.
 
-### 3\. pdf\_server
+### 3\. pdf\_server.py
 
 The `pdf_server.py` folder contains the server logic.
 
