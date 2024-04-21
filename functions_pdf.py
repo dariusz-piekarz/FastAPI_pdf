@@ -62,16 +62,19 @@ class PDF:
     async def extract_pages(self, pages: str, extraction_type: str = "delete"):
         if len(self.writer.pages) > 0:
             await self.writer_to_reader()
-        pages = get_pages(pages)
-        if extraction_type == "delete":
-            for page in self.reader.pages:
-                if page.page_number + 1 not in pages:
-                    self.writer.add_page(page)
-        elif extraction_type == "select":
-            for page in self.reader.pages:
-                if page.page_number + 1 in pages:
-                    self.writer.add_page(page)
-        logger.info("Pages selection successful!")
+        try:
+            pages = get_pages(pages)
+            if extraction_type == "delete":
+                for page in self.reader.pages:
+                    if page.page_number + 1 not in pages:
+                        self.writer.add_page(page)
+            elif extraction_type == "select":
+                for page in self.reader.pages:
+                    if page.page_number + 1 in pages:
+                        self.writer.add_page(page)
+            logger.info("Pages selection successful!")
+        except:
+            logger.warning("Pages selection failed, check arguments!")
 
     async def erase(self, temp: bool = True):
         self.writer = PdfWriter()
@@ -90,19 +93,22 @@ class PDF:
     async def rotate_pages(self, pages: str, angles: str):
         if len(self.writer.pages) > 0:
             await self.writer_to_reader()
-        if pages == "all":
-            for page in self.reader.pages:
-                self.writer.add_page(page.rotate(int(angles)))
-        else:
-            pgs, agls = match_pages_and_angles(pages, angles)
-            i = 0
-            for page in self.reader.pages:
-                if page.page_number in pgs:
-                    self.writer.add_page(page.rotate(int(agls[i])))
-                    i += 1
-                else:
-                    self.writer.add_page(page)
-        logger.info("Pages rotating successful.")
+        try:
+            if pages == "all":
+                for page in self.reader.pages:
+                    self.writer.add_page(page.rotate(int(angles)))
+            else:
+                pgs, agls = match_pages_and_angles(pages, angles)
+                i = 0
+                for page in self.reader.pages:
+                    if page.page_number in pgs:
+                        self.writer.add_page(page.rotate(int(agls[i])))
+                        i += 1
+                    else:
+                        self.writer.add_page(page)
+            logger.info("Pages rotating successful.")
+        except:
+            logger.warning("Pages rotating failed, check arguments!")
 
     async def writer_to_reader(self):
         try:
@@ -124,79 +130,109 @@ class PDF:
         if len(self.writer.pages) > 0:
             await self.writer_to_reader()
         await self.reader_to_writer()
-        prev_pg_number = pg_number-1 if pg_number > 0 else 0
-        width = self.reader.pages[prev_pg_number].mediabox.width
-        height = self.reader.pages[prev_pg_number].mediabox.height
-        self.writer.insert_blank_page(index=pg_number, width=width, height=height)
-        logger.info("Blank page inserted successfully!")
+        try:
+            prev_pg_number = pg_number-1 if pg_number > 0 else 0
+            width = self.reader.pages[prev_pg_number].mediabox.width
+            height = self.reader.pages[prev_pg_number].mediabox.height
+            self.writer.insert_blank_page(index=pg_number, width=width, height=height)
+            logger.info("Blank page inserted successfully!")
+        except:
+            logger.warning("Blank page insertion failed, check arguments!")
 
     async def insert_page(self, other_path: str, pg_number: int, position: int):
         if len(self.writer.pages) > 0:
             await self.writer_to_reader()
         await self.reader_to_writer()
-        pg = PdfReader(other_path).pages[pg_number]
-        self.writer.insert_page(pg, index=position)
-        logger.info("Page inserted successfully!")
+        try:
+            pg = PdfReader(other_path).pages[pg_number]
+            self.writer.insert_page(pg, index=position)
+            logger.info("Page inserted successfully!")
+        except:
+            logger.warning("Page insertion failed, check arguments!")
 
     async def add_blank(self):
         if len(self.writer.pages) > 0:
             await self.writer_to_reader()
         await self.reader_to_writer()
-        width = self.reader.pages[-1].mediabox.width
-        height = self.reader.pages[-1].mediabox.height
-        self.writer.add_blank_page(width, height)
-        logger.info("Blank page inserted successfully!")
+        try:
+            width = self.reader.pages[-1].mediabox.width
+            height = self.reader.pages[-1].mediabox.height
+            self.writer.add_blank_page(width, height)
+            logger.info("Blank page inserted successfully!")
+        except:
+            logger.warning("Blank page insertion failed, check arguments!")
 
-    async def encrypt(self, password: str):
+    async def encrypt(self, password: str | bytes):
         if len(self.writer.pages) == 0:
             await self.reader_to_writer()
-        self.writer.encrypt(password)
-        logger.info("File encrypted with password provided!")
+        try:
+            self.writer.encrypt(password)
+            logger.info("File encrypted with password provided!")
+        except:
+            logger.warning("File encryption failed, check arguments!")
 
     async def decrypt(self, password: str):
-        self.reader.decrypt(password)
-        await self.reader_to_writer()
-        logger.info("File decrypted.")
+        try:
+            self.reader.decrypt(password)
+        except:
+            logger.warning("File decryption failed, check arguments!")
+        else:
+            await self.reader_to_writer()
+            logger.info("File decrypted.")
+        finally:
+            pass
 
     async def reader_to_writer(self):
         self.writer.clone_document_from_reader(self.reader)
         logger.info("Read file in the writer mode.")
 
     async def extract_image(self, pg_number: int, path_to_image: str):
-        count = 0
-        if len(self.reader.pages[pg_number].images) > 0:
-            for image_file_object in self.reader.pages[pg_number].images:
-                with open(path_to_image + "\\" + str(count) + image_file_object.name, "wb") as fp:
-                    fp.write(image_file_object.data)
-                    count += 1
-            logger.info("Images extracted successfully!")
-        else:
-            logger.warning("No Image files were found.")
+        try:
+            count = 0
+            if len(self.reader.pages[pg_number].images) > 0:
+                for image_file_object in self.reader.pages[pg_number].images:
+                    with open(path_to_image + "\\" + str(count) + image_file_object.name, "wb") as fp:
+                        fp.write(image_file_object.data)
+                        count += 1
+                logger.info("Images extracted successfully!")
+            else:
+                logger.warning("No Image files were found.")
+        except:
+            logger.warning("Image extraction failed, check arguments!")
 
     async def extract_text(self, pages: str) -> dict[str: str]:
-        list_of_pages = get_pages(pages)
-        result = {}
-        if len(self.writer.pages) > 0:
-            await self.writer_to_reader()
-        for page in self.reader.pages:
-            if page.page_number in list_of_pages:
-                result[str(page.page_number)] = page.extract_text()
-        return result
+        try:
+            list_of_pages = get_pages(pages)
+            result = {}
+            if len(self.writer.pages) > 0:
+                await self.writer_to_reader()
+            for page in self.reader.pages:
+                if page.page_number in list_of_pages:
+                    result[str(page.page_number)] = page.extract_text()
+            return result
+        except:
+            logger.warning("Text extraction failed, check arguments!")
 
 
 async def merge_pdfs(pdfs_to_merge: list[str], output_path: str | None, output_name: str | None):
     merger = PdfWriter()
-    for pdf in pdfs_to_merge:
-        merger.append(pdf)
-    if output_name is not None and output_path is not None:
-        out_name = output_path + "\\" + output_name + ".pdf"
-    elif output_name is None and output_path is not None:
-        out_name = output_path + r"\merged_pdfs.pdf"
-    elif output_name is not None and output_path is None:
-        out_name = output_name + ".pdf"
-    else:
-        out_name = "merged_pdfs.pdf"
+    try:
+        for pdf in pdfs_to_merge:
+            merger.append(pdf)
+    except:
+        logger.warning("PDFs merging failed, check arguments!")
+    try:
+        if output_name is not None and output_path is not None:
+            out_name = output_path + "\\" + output_name + ".pdf"
+        elif output_name is None and output_path is not None:
+            out_name = output_path + r"\merged_pdfs.pdf"
+        elif output_name is not None and output_path is None:
+            out_name = output_name + ".pdf"
+        else:
+            out_name = "merged_pdfs.pdf"
 
-    merger.write(out_name)
-    merger.close()
-    logger.info(f"PDFs merged to {out_name}")
+        merger.write(out_name)
+        merger.close()
+        logger.info(f"PDFs merged to {out_name}")
+    except:
+        logger.warning("Target path or  name invalid!")

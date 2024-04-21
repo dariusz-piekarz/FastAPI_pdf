@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from loguru import logger
 import httpx
 from contextlib import asynccontextmanager
+
+
 from functions_pdf import PDF, merge_pdfs, generate_random_string, string_to_none
 
 
@@ -71,7 +73,7 @@ async def rotate_pages(id: str, pages: str, angles: str) -> dict:
 
 @logger.catch
 @pdfAPI.put("/pdf/{id}/erase")
-async def erase(id: str, erase_temporary: str) -> dict:
+async def erase(id: str, erase_temporary: bool) -> dict:
     await Shared.documents[id].erase(erase_temporary)
     logger.info("Temporary data erased successfully.")
     return {"id": id, "Message": "Temporary data erased successfully."}
@@ -96,7 +98,7 @@ async def insert_blank(id: str, pg_number: int) -> dict:
 @logger.catch
 @pdfAPI.put("/pdf/{id}/add_blank")
 async def add_blank(id: str) -> dict:
-    await Shared.documents[id].add_blank_page()
+    await Shared.documents[id].add_blank()
     logger.info("Empty page appended.")
     return {"id": id, "Message": f"Empty page appended successfully."}
 

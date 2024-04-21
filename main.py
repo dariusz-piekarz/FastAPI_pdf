@@ -7,3 +7,4 @@ if __name__ == "__main__":
 
 # cd C:\Users\DXD\PycharmProjects\FastAPI_pdf                 <- path to the working directory
 # uvicorn pdf_server:pdfAPI --host 0.0.0.0 --port 8000        <- run server from cmd
+# http://127.0.0.1:8000/docs                                  <- service layout provided by
