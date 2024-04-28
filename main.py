@@ -15,14 +15,17 @@ def run_actions() -> None:
     run(main())
 
 
-def run_as_processes() -> None:
+def run_as_processes(daemon: bool = True) -> None:
     server = ["uvicorn", "pdf_server:pdfAPI", "--host", "0.0.0.0", "--port", "8000"]
     cd = ["cd", r"C:\Users\DXD\PycharmProjects\FastAPI_pdf"]
-    p1 = Process(target=run_server, args=(server, cd))
+
+    p1 = Process(target=run_server, args=(server, cd), daemon=daemon)
     p2 = Process(target=run_actions, args=())
+
     p1.start()
     p2.start()
-    p1.join()
+    if daemon:
+        p1.join()
     p2.join()
 
 
