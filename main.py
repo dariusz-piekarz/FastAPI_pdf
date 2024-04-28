@@ -5,17 +5,17 @@ from subprocess import run as sys_run
 from multiprocessing import Process
 
 
-def run_server(server: list[str], cd: str):
+def run_server(server: list[str], cd: list[str]) -> None:
     sys_run(cd, shell=True)
     sys_run(server)
 
 
-def run_actions():
+def run_actions() -> None:
     sleep(4)
     run(main())
 
 
-def run_as_processes():
+def run_as_processes() -> None:
     server = ["uvicorn", "pdf_server:pdfAPI", "--host", "0.0.0.0", "--port", "8000"]
     cd = ["cd", r"C:\Users\DXD\PycharmProjects\FastAPI_pdf"]
     p1 = Process(target=run_server, args=(server, cd))
